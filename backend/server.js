@@ -21,6 +21,9 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/contact", contactRoutes);
 
+const careerRoutes = require("./routes/career");
+app.use("/api/career", careerRoutes);
+
 app.get("/test", (req, res) => {
   res.send("Hello from backend");
 });
