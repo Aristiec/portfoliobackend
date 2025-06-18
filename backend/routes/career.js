@@ -1,74 +1,55 @@
 const express = require("express");
-const router = express.Router();
+const multer = require("multer");
+const path = require("path");
 const CareerApplication = require("../models/CareerApplication");
-const nodemailer = require("nodemailer");
-require("dotenv").config();
+const router = express.Router();
 
-router.post("/", async (req, res) => {
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = `${Date.now()}-${file.originalname}`;
+    cb(null, uniqueName);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === "application/pdf") cb(null, true);
+  else cb(new Error("Only PDF files are allowed"), false);
+};
+
+const upload = multer({ storage, fileFilter });
+
+// ✅ POST /api/career
+router.post("/", upload.single("document"), async (req, res) => {
   try {
-    const {
-      name,
-      email,
-      countryCode,
-      phone,
-      linkedIn,
-      portfolio,
-      experience,
-      documentUrl,
-    } = req.body;
+    const { name, email, phone, countryCode, linkedIn, portfolio, experience } =
+      req.body;
+
+    const documentUrl = req.file
+      ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
+      : "";
 
     const newApplication = new CareerApplication({
       name,
       email,
-      countryCode,
       phone,
+      countryCode,
       linkedIn,
       portfolio,
       experience,
       documentUrl,
+      documentOriginalName: req.file?.originalname || null,
     });
 
     await newApplication.save();
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: process.env.EMAIL_USER,
-      replyTo: email,
-      subject: `New Career Application from ${name}`,
-      html: `
-        <h2>New Application Details</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Phone:</strong> ${countryCode} ${phone}</p>
-        <p><strong>LinkedIn:</strong> <a href="${linkedIn}">${linkedIn}</a></p>
-        <p><strong>Portfolio:</strong> <a href="${portfolio}">${portfolio}</a></p>
-        <p><strong>Experience:</strong> ${experience} year(s)</p>
-        ${
-          documentUrl
-            ? `<p><strong>Document:</strong> <a href="${documentUrl}">View Document</a></p>`
-            : ""
-        }
-      `,
-    });
-
-    res.status(200).json({ success: true, message: "Application submitted!" });
+    res.status(200).json({ success: true, message: "Application submitted" });
   } catch (err) {
-    console.error("Career form error:", err);
-    res.status(500).json({ success: false, message: "Server Error" });
+    console.error("Error saving application:", err);
+    res.status(500).json({ success: false, message: "Server error" });
   }
-});
-
-// Optional test route
-router.get("/test", (req, res) => {
-  res.send("Career route is live!");
 });
 
 module.exports = router;

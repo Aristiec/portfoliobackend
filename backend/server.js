@@ -8,6 +8,7 @@ connectDB();
 
 const authRoutes = require("./routes/auth");
 const contactRoutes = require("./routes/ContactRoute");
+const path = require("path");
 
 const app = express();
 
@@ -22,6 +23,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/contact", contactRoutes);
 
 const careerRoutes = require("./routes/career");
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 app.use("/api/career", careerRoutes);
 
 app.get("/test", (req, res) => {

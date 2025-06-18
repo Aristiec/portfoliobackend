@@ -10,6 +10,7 @@ const careerApplicationSchema = new mongoose.Schema(
     portfolio: { type: String },
     experience: { type: Number },
     documentUrl: { type: String },
+    documentOriginalName: { type: String },
   },
   { timestamps: true }
 );
