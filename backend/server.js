@@ -3,11 +3,13 @@ const connectDB = require("./config/db");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const authRoutes = require("./routes/auth");
+const contactRoutes = require("./routes/contact");
 
 dotenv.config();
 connectDB();
 
 const app = express();
+
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -20,6 +22,7 @@ app.use(
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/contact", contactRoutes);
 
 app.get("/test", (req, res) => {
   res.send("Hello from backend");
