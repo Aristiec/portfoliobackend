@@ -7,36 +7,38 @@ const jwt = require("jsonwebtoken");
 
 // POST /api/auth/register
 router.post("/register", async (req, res) => {
-  console.log("Register endpoint hit", req.body);
+  console.log("Register endpoint hit");
+  console.log("Incoming body:", req.body);
+
   try {
     const { name, phone, email, password } = req.body;
 
-    // Check if user exists
+    if (!name || !phone || !email || !password) {
+      return res.status(400).json({ msg: "All fields are required" });
+    }
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ msg: "User already exists" });
     }
 
-    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Save new user
     const newUser = new User({ name, phone, email, password: hashedPassword });
     await newUser.save();
 
-    // Optionally return a token
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       token,
       user: { id: newUser._id, name: newUser.name, email: newUser.email },
     });
   } catch (err) {
     console.error("Register error:", err);
-    res.status(500).json({ msg: "Server Error" });
+    return res.status(500).json({ msg: "Server Error", error: err.message });
   }
 });
 
