@@ -67,6 +67,7 @@ router.post("/", async (req, res) => {
     res.status(500).json({ success: false, message: "Server error!" });
   }
 });
+console.log("ContactRoute loaded");
 
 router.get("/test", (req, res) => {
   res.send("Contact route is live!");
