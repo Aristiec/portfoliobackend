@@ -68,4 +68,8 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.get("/test", (req, res) => {
+  res.send("Contact route is live!");
+});
+
 module.exports = router;
