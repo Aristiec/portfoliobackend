@@ -17,13 +17,15 @@ const allowedOrigins = ["https://aristiec.com", "http://localhost:3000"];
 app.use(
   cors({
     origin: function (origin, callback) {
+      console.log("Origin trying to access:", origin);
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
+        console.error("Blocked by CORS:", origin);
         callback(new Error("Not allowed by CORS"));
       }
     },
-    credentials: true, // 🔥 ALLOW COOKIES
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
