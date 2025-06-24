@@ -28,6 +28,10 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/contact", contactRoutes);
