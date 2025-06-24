@@ -42,7 +42,6 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// Login
 router.post("/login", async (req, res) => {
   console.log("Login endpoint hit", req.body);
   const { email, password } = req.body;
@@ -58,9 +57,18 @@ router.post("/login", async (req, res) => {
       expiresIn: "2h",
     });
 
-    res.json({
-      token,
+    // 🔐 Send token as HTTP-only cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: 2 * 60 * 60 * 1000, // 2 hours
+    });
+
+    // ✅ Send response without token in body
+    res.status(200).json({
       user: { id: user._id, name: user.name, email: user.email },
+      msg: "Login successful",
     });
   } catch (err) {
     res.status(500).json({ msg: "Server error", error: err.message });
