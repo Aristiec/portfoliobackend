@@ -12,7 +12,7 @@ const path = require("path");
 
 const app = express();
 
-const allowedOrigins = ["https://aristiec.com"];
+const allowedOrigins = ["https://aristiec.com", "http://localhost:3000"];
 
 app.use(
   cors({
