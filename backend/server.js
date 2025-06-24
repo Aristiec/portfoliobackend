@@ -12,8 +12,11 @@ const path = require("path");
 
 const app = express();
 
-const allowedOrigins = ["https://aristiec.com", "http://localhost:3000"];
-
+const allowedOrigins = [
+  "https://aristiec.com",
+  "https://www.aristiec.com",
+  "http://localhost:3000",
+];
 app.use(
   cors({
     origin: function (origin, callback) {
